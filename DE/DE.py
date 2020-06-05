@@ -1,7 +1,4 @@
 # Simple differential evolution based on https://github.com/nathanrooy/differential-evolution-optimization
-
-# import numpy as np
-
 from random import random, sample, uniform, seed
 
 import matplotlib.pyplot as plt
@@ -32,20 +29,28 @@ class DifferentialEvolution():
         self.best_agent = None
         self.best_val = None
 
-    def run(self):
+    def run(self, crossover="std",verbose=True):
+        if crossover == 'points':
+            crossover = self.crossover
+        elif crossover == "std":
+            crossover = self.crossover_on_points
+        else:
+            raise TypeError(f"Crossover {crossover} is not supported")
+        
         self.init_population()
 
         # Interations
         for i in range(1, self.max_iter+1):
             self.improves = False
-            print("GENERATION:", i)
+            if verbose:
+                print("GENERATION:", i)
 
             self.gen_obj_val = []
 
             # A single generation
             for j, agent_target in enumerate(self.population):
                 agent_donor = self.mutate(j)
-                agent_trail = self.crossover(agent_donor, agent_target)
+                agent_trail = crossover(agent_donor, agent_target)
                 self.selection(j, agent_target, agent_trail)
 
             # Statistics
@@ -63,8 +68,6 @@ class DifferentialEvolution():
         self.num_gen = i
         self.best_obj_val = gen_best_val
         self.best_agent = gen_best_agent
-
-        return gen_best_val, gen_best_agent
 
     def init_population(self):
         # Initialize population
@@ -106,6 +109,21 @@ class DifferentialEvolution():
             else:
                 agent.append(agent2[i])
         return agent
+    
+    def crossover_on_points(self, agent1, agent2):
+        # Crossover on points
+        agents = []
+        for i in range(0, self.agent_length, 2):
+            rng = random()
+            
+            if rng <= self.crossover_prob:
+                agent.append(agent1[i])
+                agent.append(agent1[i+1])
+            else:
+                agent.append(agent2[i])
+                agent.append(agent2[i+1])
+        return agent
+        
 
     def selection(self, agent_idx, agent, new_agent):
         # Greedy selection
