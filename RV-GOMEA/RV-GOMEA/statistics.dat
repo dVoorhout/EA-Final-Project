@@ -1,0 +1,7 @@
+# Generation  Evaluations  Time(s)  Best-obj. Best-cons. [Pop.index  Subgen.  Pop.size  Dis.mult.[0]  Pop.best.obj. Pop.avg.obj.  Pop.var.obj. Pop.worst.obj.  Pop.best.con. Pop.avg.con.  Pop.var.con. Pop.worst.con.]
+         0   10.000000       0.006 -1.7000850576e-01  0.000000e+00  
+         0   79.000000       0.008 -1.9161406765e-01  0.000000e+00  
+         1  820.000000       0.063 -2.6982988340e-01  0.000000e+00  
+         2 6991.000000       0.333 -3.8681309152e-01  0.000000e+00  
+         3 20306.000000       0.946 -3.9934791644e-01  0.000000e+00  
+         4 127817.000000       6.869 -4.1954208917e-01  0.000000e+00  
