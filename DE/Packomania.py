@@ -15,7 +15,7 @@ class Packomania():
         self.read_origin()
 
         self.points = [] # Does not work
-        self.points_min_dist = -self.circle_radius / (2*self.circle_radius - 1)
+        self.points_min_dist = -2*self.circle_radius / (2*self.circle_radius - 1)
         
         # self.convert_to_scattering_points()
         

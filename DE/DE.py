@@ -14,6 +14,7 @@ class DifferentialEvolution():
         self.differential_weight = differential_weight
         self.crossover_prob = crossover_prob
         self.max_iter = max_iterations
+        self.evaluations = 0
 
         self.population = []
         self.improves = True
@@ -137,6 +138,7 @@ class DifferentialEvolution():
         # Greedy selection
         obj_val_agent = self.obj_func(agent)
         obj_val_new = self.obj_func(new_agent)
+        self.evaluations += 1;
 
         # Maximization
         if obj_val_new > obj_val_agent:
