@@ -32,7 +32,7 @@ class DifferentialEvolution():
         self.best_agent = None
         self.best_val = None
 
-    def run(self, crossover="std", save_pop_each_iter=False,  stop_on_no_improvements=True, max_evaluations=None,verbose=True):
+    def run(self, crossover="std", is_optinum_func=None, save_pop_each_iter=False, stop_on_no_improvements=True, max_evaluations=None, verbose=True):
         if crossover == 'points':
             crossover = self.crossover_on_points
         elif crossover == "std":
@@ -79,7 +79,6 @@ class DifferentialEvolution():
                 print("\t{:<12}: {}s".format("TIME", end_time-start_time))
 
 
-
             # Stop if there is not improvement this generation
             if stop_on_no_improvements and not self.improves:
                 print("No generational improved")
@@ -88,6 +87,11 @@ class DifferentialEvolution():
             # Stop if the max number of evaluations has been exceeded 
             if max_evaluations is not None and self.evaluations >= max_evaluations:
                 print("Max number of evaluations")
+                break
+            
+            # Stop if the optinum has been reached
+            if is_optinum_func is not None and is_optinum_func(gen_best_val):
+                print("optinum reached")
                 break
 
         self.num_gen = i

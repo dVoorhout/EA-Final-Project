@@ -19,6 +19,7 @@ class Packomania():
         
         # self.convert_to_scattering_points()
         
+        
     
     def read_radius(self):
         self.circle_radius = []
@@ -72,4 +73,10 @@ class Packomania():
                 self.points.append(1)
             else:
                 self.points.append(point[Y])
+
+    def is_optinum(self, obj_val, accuracy):
+        if abs(self.points_min_dist - obj_val) <= accuracy:
+            return True
+        else:
+            return False
                 
