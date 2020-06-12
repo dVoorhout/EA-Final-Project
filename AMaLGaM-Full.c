@@ -1260,12 +1260,13 @@ void spherePackingFunctionProblemEvaluation(double *parameters, double *objectiv
 	}
 
 	//printf("--------------------------------------------\n");
-	double smallestDistanceFound = 100000;
+	double smallestDistanceFound = 1000;
+	double calculatedDistance = 0;
 	for (int i = 0; i < numberOfPoints - 1; i++) {
 		for (int j = i + 1; j < numberOfPoints; j++) {
-			double distance = euclidianDistance(points[i], points[j]);
-			if (distance < smallestDistanceFound) {
-				smallestDistanceFound = distance;
+			calculatedDistance = euclidianDistance(points[i], points[j]);
+			if (calculatedDistance < smallestDistanceFound) {
+				smallestDistanceFound = calculatedDistance;
 			}
 		}
 	}
