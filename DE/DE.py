@@ -1,6 +1,7 @@
 # Simple differential evolution based on https://github.com/nathanrooy/differential-evolution-optimization
 from random import random, sample, uniform, seed
 from copy import deepcopy
+from time import time
 import matplotlib.pyplot as plt
 
 
@@ -17,10 +18,10 @@ class DifferentialEvolution():
         self.evaluations = 0
 
         self.population = []
-        self.improves = True
+        self.population_obj_values = []
+        self.improves = True # Flag the see if the population still improves within a generation
 
         # Statistics
-        self.gen_obj_val = []
         self.iter_best_obj_val = []
         self.iter_best_agent = []
         self.iter_avg_obj_val = []
@@ -31,7 +32,7 @@ class DifferentialEvolution():
         self.best_agent = None
         self.best_val = None
 
-    def run(self, crossover="std", save_pop_each_iter=False,  stop_on_no_improvements=True, verbose=True):
+    def run(self, crossover="std", save_pop_each_iter=False,  stop_on_no_improvements=True, max_evaluations=None,verbose=True):
         if crossover == 'points':
             crossover = self.crossover_on_points
         elif crossover == "std":
@@ -46,8 +47,7 @@ class DifferentialEvolution():
             self.improves = False
             if verbose:
                 print("GENERATION:", i)
-
-            self.gen_obj_val = []
+                start_time = time()
 
             # A single generation
             for j, agent_target in enumerate(self.population):
@@ -56,23 +56,40 @@ class DifferentialEvolution():
                 self.selection(j, agent_target, agent_trail)
 
             # Statistics
-            gen_avg_val = sum(self.gen_obj_val) / self.popsize
-            gen_best_val = max(self.gen_obj_val)
-            gen_best_agent = self.population[self.gen_obj_val.index(gen_best_val)]
+            gen_avg_val = sum(self.population_obj_values) / self.popsize
+            gen_best_val = max(self.population_obj_values)
+            gen_best_agent = self.population[self.population_obj_values.index(gen_best_val)]
         
             self.iter_avg_obj_val.append(gen_avg_val)
             self.iter_best_obj_val.append(gen_best_val)
             self.iter_best_agent.append(gen_best_agent.copy())
 
-            # Save population
+            # Save the best 100 agents each population
             if save_pop_each_iter:
-                obj_val_best_100 = sorted(self.gen_obj_val, reverse=True)[:100]
-                population_best_100 = [self.population[self.gen_obj_val.index(obj_val)] for obj_val in obj_val_best_100]
+                obj_val_best_100 = sorted(self.population_obj_values, reverse=True)[:100]
+                population_best_100 = [self.population[self.population_obj_values.index(obj_val)] for obj_val in obj_val_best_100]
                 self.iter_population.append(deepcopy(population_best_100))
+
+            # Print number of evaluations
+            if verbose:
+                end_time = time()
+                # print("\tEVALUATIONS:", self.evaluations)
+                # print("\tTIME \t\t:{}s".format(end_time-start_time))
+                print("\t{:<12}: {}".format("EVALUATIONS", self.evaluations))
+                print("\t{:<12}: {}s".format("TIME", end_time-start_time))
+
+
 
             # Stop if there is not improvement this generation
             if stop_on_no_improvements and not self.improves:
+                print("No generational improved")
                 break
+
+            # Stop if the max number of evaluations has been exceeded 
+            if max_evaluations is not None and self.evaluations >= max_evaluations:
+                print("Max number of evaluations")
+                break
+
         self.num_gen = i
         self.best_obj_val = gen_best_val
         self.best_agent = gen_best_agent
@@ -83,7 +100,10 @@ class DifferentialEvolution():
         self.population = []
         for i in range(self.popsize):
             agent = [uniform(lb, ub) for lb, ub in self.bounds]
+            agent_obj_val = self.obj_func(agent)
+            self.evaluations += 1
             self.population.append(agent)
+            self.population_obj_values.append(agent_obj_val)
 
     def mutate(self, target_idx):
         # Select three parents excluding the target agent
@@ -136,14 +156,12 @@ class DifferentialEvolution():
 
     def selection(self, agent_idx, agent, new_agent):
         # Greedy selection
-        obj_val_agent = self.obj_func(agent)
+        obj_val_agent = self.population_obj_values[agent_idx]
         obj_val_new = self.obj_func(new_agent)
-        self.evaluations += 1;
+        self.evaluations += 1
 
         # Maximization
         if obj_val_new > obj_val_agent:
             self.population[agent_idx] = new_agent
-            self.gen_obj_val.append(obj_val_new)
+            self.population_obj_values[agent_idx] = obj_val_new
             self.improves = True
-        else:
-            self.gen_obj_val.append(obj_val_agent)
