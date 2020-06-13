@@ -3,6 +3,8 @@ from math import sqrt
 from time import sleep, time
 
 def get_coordinates(solution):
+    # Decodes the solution into x and y coordinates
+    # The solution are encoded as an array of [x1, y1, x2, y2, ..., xn, yn]
     x = []
     y = []
     for i in range(0, len(solution), 2):
@@ -17,6 +19,7 @@ def plot_solution(solution):
     plt.show()
 
 def plot_best_solution_progress(solutions, duration=20):
+    # Animation on how the best solution progresses
     fig, ax = plt.subplots(figsize=(10, 10))
     h1, = ax.plot([], [], '.')
     
@@ -33,6 +36,7 @@ def plot_best_solution_progress(solutions, duration=20):
         sleep(duration/len(solutions))
         
 def plot_population_progress(populations, best_solutions, duration=20):
+    # Animation on how the population progresses
     fig, ax = plt.subplots(figsize=(8, 8))
     
     ax.set_xlabel("x")
@@ -59,6 +63,8 @@ def plot_population_progress(populations, best_solutions, duration=20):
         fig.canvas.draw()
         
         end_time = time()
+        
+        # Note: there a lower bound on the duration of the animation based speed of the computer and the size of the population
         sleep(max(0, duration/len(populations) - (end_time-start_time)))
     
 
@@ -123,3 +129,21 @@ def get_stricter_bounds(num_points):
     for i in range(num_points*2 - len(bounds)):
         bounds.append([0, 1])
     return bounds
+
+
+def find_reliable(algo, max_evaluations=None, max_generations=None, min_pop_diff=10**-10,):
+    # Returns True when the algorithm can find the optimum 10 times a row otherwise False
+    for i in range(1, 11):
+        print(f"RUN #{i}")
+        algo.reset()
+        algo.run(max_evaluations=max_evaluations,
+                 max_generations=max_generations,
+                 stop_on_small_pop_diff=min_pop_diff, # Stop when the diff between avg_obj_val and best_obj_val is too small 
+                 verbose=False) # Willl crash the jupyter notebook when turned on with many experiments
+
+        print("\tAVG_OBJ: ", algo.iter_avg_obj_val[-1])
+        print("\tBEST_OBJ:", algo.iter_best_obj_val[-1])
+        print("\tEVALUATIONS:", algo.evaluations)
+        if not algo.found_optimum:
+            return False
+    return True
