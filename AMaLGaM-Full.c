@@ -227,6 +227,7 @@ distribution_multiplier_increase, /* The multiplicative distribution multiplier 
 distribution_multiplier_decrease, /* The multiplicative distribution multiplier decrease. */
 st_dev_ratio_threshold,           /* The maximum ratio of the distance of the average improvement to the mean compared to the distance of one standard deviation before triggering AVS (SDR mechanism). */
 vtr,                              /* The value-to-reach (function value of best solution that is feasible). */
+distance_benchmark,				  /*value of the actual distance we are comparing to*/
 fitness_variance_tolerance,       /* The minimum fitness variance level that is allowed. */
 **mean_vectors,                     /* The mean vectors, one for each population. */
 **mean_vectors_previous,            /* The mean vectors of the previous generation, one for each population. */
@@ -871,8 +872,8 @@ void optionError(char **argv, int index) {
 void parseParameters(int argc, char **argv, int *index) {
 	int noError;
 
-	if ((argc - *index) != 14) {
-		printf("Number of parameters is incorrect, require 14 parameters (you provided %d).\n\n", (argc - *index));
+	if ((argc - *index) != 15) {
+		printf("Number of parameters is incorrect, require 15 parameters (you provided %d).\n\n", (argc - *index));
 
 		printUsage();
 	}
@@ -892,6 +893,7 @@ void parseParameters(int argc, char **argv, int *index) {
 	noError = noError && sscanf(argv[*index + 11], "%lf", &vtr);
 	noError = noError && sscanf(argv[*index + 12], "%d", &maximum_no_improvement_stretch);
 	noError = noError && sscanf(argv[*index + 13], "%lf", &fitness_variance_tolerance);
+	noError = noError && sscanf(argv[*index + 14], "%lf", &distance_benchmark);
 
 	if (!noError) {
 		printf("Error parsing parameters.\n\n");
@@ -1027,6 +1029,7 @@ void printVerboseOverview(void) {
 	printf("# Value to reach (vtr)    = %e\n", vtr);
 	printf("# Max. no improv. stretch = %d\n", maximum_no_improvement_stretch);
 	printf("# Fitness var. tolerance  = %e\n", fitness_variance_tolerance);
+	printf("# Distance of benchmark	  = %e\n", distance_benchmark);
 	printf("# Random seed             = %ld\n", random_seed);
 	printf("#\n");
 	printf("###################################################\n");
@@ -2260,8 +2263,11 @@ short checkVTRTerminationCondition(void) {
 	int population_of_best, index_of_best;
 
 	determineBestSolutionInCurrentPopulations(&population_of_best, &index_of_best);
-
-	if (constraint_values[population_of_best][index_of_best] == 0 && objective_values[population_of_best][index_of_best] <= vtr)
+	double result = fabs(1 / distance_benchmark - 1 / objective_values[population_of_best][index_of_best]);
+	printf("------------");
+	printf("%lf\n", result);
+	printf("%lf\n", vtr);
+	if (constraint_values[population_of_best][index_of_best] == 0 && result <= vtr)
 		return(1);
 
 	return(0);
