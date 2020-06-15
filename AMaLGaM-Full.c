@@ -2205,7 +2205,7 @@ void writeGenerationalSolutionsBest(short final) {
 	}
 	sprintf(string, "     ");
 	fputs(string, file);
-	sprintf(string, "%13e %13e", objective_values[population_index_best][individual_index_best], constraint_values[population_index_best][individual_index_best]);
+	sprintf(string, "%13e %13e %d", objective_values[population_index_best][individual_index_best], constraint_values[population_index_best][individual_index_best], number_of_evaluations);
 	fputs(string, file);
 	sprintf(string, "\n");
 	fputs(string, file);
@@ -2264,9 +2264,6 @@ short checkVTRTerminationCondition(void) {
 
 	determineBestSolutionInCurrentPopulations(&population_of_best, &index_of_best);
 	double result = fabs(1 / distance_benchmark - 1 / objective_values[population_of_best][index_of_best]);
-	printf("------------");
-	printf("%lf\n", result);
-	printf("%lf\n", vtr);
 	if (constraint_values[population_of_best][index_of_best] == 0 && result <= vtr)
 		return(1);
 
