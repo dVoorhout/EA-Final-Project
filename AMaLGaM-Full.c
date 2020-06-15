@@ -222,12 +222,12 @@ delta_AMS,                        /* The adaptation length for AMS (anticipated 
 lower_user_range,                 /* The initial lower range-bound indicated by the user (same for all dimensions). */
 upper_user_range,                 /* The initial upper range-bound indicated by the user (same for all dimensions). */
 rotation_angle,                   /* The angle of rotation to be applied to the problem. */
+vtr,                              /* The value-to-reach (function value of best solution that is feasible). */
+distance_benchmark,			  /*value of the actual distance we are comparing to*/
 *distribution_multipliers,         /* Distribution multipliers (AVS mechanism), one for each population. */
 distribution_multiplier_increase, /* The multiplicative distribution multiplier increase. */
 distribution_multiplier_decrease, /* The multiplicative distribution multiplier decrease. */
 st_dev_ratio_threshold,           /* The maximum ratio of the distance of the average improvement to the mean compared to the distance of one standard deviation before triggering AVS (SDR mechanism). */
-vtr,                              /* The value-to-reach (function value of best solution that is feasible). */
-distance_benchmark,				  /*value of the actual distance we are comparing to*/
 fitness_variance_tolerance,       /* The minimum fitness variance level that is allowed. */
 **mean_vectors,                     /* The mean vectors, one for each population. */
 **mean_vectors_previous,            /* The mean vectors of the previous generation, one for each population. */
@@ -237,6 +237,7 @@ nextNextGaussian,                 /* Internally used variable for sampling the n
 **rotation_matrix;                  /* The rotation matrix to be applied before evaluating. */
 int64_t    random_seed,                      /* The seed used for the random-number generator. */
 random_seed_changing;             /* Internally used variable for randomly setting a random seed. */
+
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-= Section Constants -=-=-=-=-=-=-=-=-=-=-=-=-=-*/
@@ -1263,8 +1264,8 @@ void spherePackingFunctionProblemEvaluation(double *parameters, double *objectiv
 	}
 
 	//printf("--------------------------------------------\n");
-	double smallestDistanceFound = 1000;
-	double calculatedDistance = 0;
+	long double smallestDistanceFound = 1000;
+	long double calculatedDistance = 0;
 	for (int i = 0; i < numberOfPoints - 1; i++) {
 		for (int j = i + 1; j < numberOfPoints; j++) {
 			calculatedDistance = euclidianDistance(points[i], points[j]);
@@ -2263,7 +2264,10 @@ short checkVTRTerminationCondition(void) {
 	int population_of_best, index_of_best;
 
 	determineBestSolutionInCurrentPopulations(&population_of_best, &index_of_best);
-	double result = fabs(1 / distance_benchmark - 1 / objective_values[population_of_best][index_of_best]);
+
+	double bench_divided = (double)1 / distance_benchmark;
+	double objective_divided = 1 / objective_values[population_of_best][index_of_best];
+	double result = fabs(bench_divided - objective_divided);
 	if (constraint_values[population_of_best][index_of_best] == 0 && result <= vtr)
 		return(1);
 
