@@ -7,22 +7,34 @@ PACKOMANIA_DIR = r"./Packomania/"
 class Packomania():
     def __init__(self, num_points):
         self.num_points = num_points
-        
+
         self.circle_origin = []
         self.circle_radius = 0
-                
+        self.distance = 0
+
+        self.read_distance()
         self.read_radius()
         self.read_origin()
 
-        self.points = [] # Does not work
-        self.points_min_dist = -2*self.circle_radius / (2*self.circle_radius - 1)
-        
+        self.points = []  # Does not work
+        self.points_min_dist = -2*self.circle_radius /  (2*self.circle_radius - 1) # Is the same the self.distance, and is kept for compatability
+
+
         # self.convert_to_scattering_points()
-        
-        
+
+    def read_distance(self):
+        self.distance = 0
+        with open(f"{PACKOMANIA_DIR}/distance.txt") as f:
+            # File consits of: number of points, radius
+            for line in f.read().split("\n")[:-1]: # Exclude last empty line
+                num_circles, distance = line.split()
+                
+                if int(num_circles) == self.num_points:
+                    self.distance = float(distance)
+                    break
     
     def read_radius(self):
-        self.circle_radius = []
+        self.circle_radius = 0
         with open(f"{PACKOMANIA_DIR}/radius.txt") as f:
             # File consits of: number of points, radius
             for line in f.read().split("\n")[:-1]: # Exclude last empty line
@@ -74,9 +86,9 @@ class Packomania():
             else:
                 self.points.append(point[Y])
 
-    def is_optinum(self, obj_val, accuracy):
-        if abs(self.points_min_dist - obj_val) <= accuracy:
-            return True
-        else:
-            return False
+
+if __name__ == "__main__":
+    num_circles = 3
+    pk = Packomania(num_circles)
+    print(pk.distance)
                 

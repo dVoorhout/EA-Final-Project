@@ -1,8 +1,11 @@
 # Simple differential evolution based on https://github.com/nathanrooy/differential-evolution-optimization
+import matplotlib.pyplot as plt
+
 from random import random, randint, sample, uniform, seed
 from copy import deepcopy
 from time import time
-import matplotlib.pyplot as plt
+
+from utils import Exitflag
 
 
 class DifferentialEvolution():
@@ -23,6 +26,7 @@ class DifferentialEvolution():
         self.optimum = None
         self.optimum_accuracy = None
         self.found_optimum = False
+        self.exitflag = None
 
         # Statistics
         self.iter_best_obj_val = []
@@ -45,6 +49,7 @@ class DifferentialEvolution():
         self.population_obj_values = []
         self.improves = True # Flag the see if the population still improves within a generation
         self.found_optimum = False
+        self.exitflag = None
 
         # Statistics
         self.iter_best_obj_val = []
@@ -127,35 +132,35 @@ class DifferentialEvolution():
 
             # Stop if there is not improvement this generation
             if stop_on_no_improvements and not self.improves:
+                self.exitflag = Exitflag.no_improvements
                 print("No generational improvement")
-                break
-
-            # Stop if the max number of evaluations has been exceeded 
-            if max_evaluations is not None and self.evaluations >= max_evaluations:
-                print("Max number of evaluations")
-                break
-            
-            # Stop if the optinum has been reached
-            if self.optimum is not None and self.is_optimum(gen_best_val):
-                print("Optimum reached")
-                break
+                break            
             
             # Stop if the population has converges
             if (gen_best_val == gen_avg_val) \
                 or (stop_on_small_pop_diff is not None \
-                and abs(gen_best_val - gen_avg_val) <= stop_on_small_pop_diff):
+                and abs(gen_best_val - gen_avg_val) < stop_on_small_pop_diff):
+                self.exitflag = Exitflag.pop_converged
                 print("Population converged")
                 break
             
             
             # Stop if the maximum number of evaluations has been reached
             if max_evaluations is not None and self.evaluations >= max_evaluations:
+                self.exitflag = Exitflag.max_evals
                 print("Maximum number of evaluations")
                 break
             
             # Stop if the maximum number of generations has been reached
             if max_generations is not None and gen >= max_generations:
+                self.exitflag = Exitflag.max_gen
                 print("Maximum number of generations")
+                break
+
+            # Stop if the optimum has been reached
+            if self.optimum is not None and self.is_optimum(gen_best_val):
+                self.exitflag = Exitflag.optimum
+                print("Optimum reached")
                 break
             
             gen += 1

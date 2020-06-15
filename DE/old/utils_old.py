@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import numpy as np
+import pickle
+
 from math import sqrt
 from time import sleep, time
 
@@ -103,10 +106,10 @@ def scattering_points(solution):
             if i != j:
                 x1, y1 = solution[i:i+2]
                 x2, y2 = solution[j:j+2]
-                result = sqrt((x1 - x2)**2 + (y1 - y2)**2)
+                result = (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2)
                 if result < d:
                     d = result
-    return d
+    return sqrt(d)
 
 def get_stricter_bounds(num_points):
     # Split the bounds of [0,1] into smaller bounds for each points such that each point is in its own compartment
@@ -131,19 +134,78 @@ def get_stricter_bounds(num_points):
     return bounds
 
 
-def find_reliable(algo, max_evaluations=None, max_generations=None, min_pop_diff=10**-10,):
+def find_reliable(algo, 
+                  stop_on_fail=True,
+                  max_evaluations=None, 
+                  max_generations=None, 
+                  min_pop_diff=10**-12, 
+                  verbose=True):
     # Returns True when the algorithm can find the optimum 10 times a row otherwise False
+    results = dict()
+    results['evaluations'] = []
+    results['avg_obj_vals'] = []
+    results['best_obj_vals'] = []
+    results['optimum'] = 0
+    
+    failed_flag = False
     for i in range(1, 11):
         print(f"RUN #{i}")
+        start_time = time()
         algo.reset()
         algo.run(max_evaluations=max_evaluations,
                  max_generations=max_generations,
                  stop_on_small_pop_diff=min_pop_diff, # Stop when the diff between avg_obj_val and best_obj_val is too small 
                  verbose=False) # Willl crash the jupyter notebook when turned on with many experiments
 
-        print("\tAVG_OBJ: ", algo.iter_avg_obj_val[-1])
-        print("\tBEST_OBJ:", algo.iter_best_obj_val[-1])
-        print("\tEVALUATIONS:", algo.evaluations)
+        if verbose:
+            print("\tAVG_OBJ: ", algo.iter_avg_obj_val[-1])
+            print("\tBEST_OBJ:", algo.iter_best_obj_val[-1])
+            print("\tEVALUATIONS:", algo.evaluations)
+        print(f"\tRUN DURATION: {time()-start_time}s")
+        
+        
+        results['avg_obj_vals'].append(algo.iter_avg_obj_val[-1])
+        results['best_obj_vals'].append(algo.iter_best_obj_val[-1])
+        results['evaluations'].append(algo.evaluations)
+        
         if not algo.found_optimum:
-            return False
-    return True
+            failed_flag = True
+        else:
+            results['optimum'] += 1
+        
+        if stop_on_fail and failed_flag:
+            return failed_flag, results
+    return failed_flag, results
+
+
+def save_reliable_results(filename, x, results, x_name="x"):
+    with open(filename, 'w') as f:
+        f.write(f"{x_name},VTR_reached_count,mean_evaluations,std_evaluations,mean_avg_obj_vals,std_avg_obj_vals,mean_best_obj_vals,std_best_obj_vals\n")
+    
+        for xx, r in zip(x, results):
+            mean_eva = np.mean(r['evaluations'])
+            std_eva = np.std(r['evaluations'])
+
+            mean_avg_obj_vals = np.mean(r['avg_obj_vals'])
+            std_avg_obj_vals = np.std(r['avg_obj_vals'])
+
+            mean_best_obj_vals = np.mean(r['best_obj_vals'])
+            std_best_obj_vals = np.std(r['best_obj_vals'])
+
+            f.write(f"{xx},{r['optimum']},{mean_eva},{std_eva},{mean_avg_obj_vals},{std_avg_obj_vals},{mean_best_obj_vals},{std_best_obj_vals}\n")
+            
+            
+def save_pickle(filename, obj):
+    with open(filename, "wb") as f:
+        pickle.dump(obj, f)
+        print("Saved object")
+
+        
+        
+def load_pickle(filename):
+    with open(filename, "rb") as f:
+        results = pickle.load(f)
+    return results
+                         
+        
+    

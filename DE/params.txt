@@ -1,0 +1,11 @@
+Settings:
+    differential_weight = 0.5         
+    crossover_prob = 0.95      
+    max_generations = 1000
+    optimum_accuracy = 10**-3
+    
+    dim:
+        3 : 64
+        4 : 64
+        5 : 64
+        6 : 256
