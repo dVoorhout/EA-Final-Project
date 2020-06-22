@@ -7,11 +7,11 @@ from numpy import load
 
 result_file_name = 'best_generation_final.dat'
 distances_file = 'distance.txt'
-number_of_circles = [2, 4,5,6,7,9]
+number_of_circles = [2,4,5,6,7,9]
 number_of_evaluations = 1e10
 allowed_variance = 0
 check_improvement_checkpoints = 50
-vtrs = [10**-3, 10**-6]#, 10**-6]
+vtrs = [10**-3, 10**-6]
 number_of_runs = 10
 pop_size_multipliers = 2
 pop_size = 1
@@ -38,7 +38,7 @@ def main():
                 restart_count = 0
                 while not done_with_run:
                     time.sleep(1)
-                    cmd = "AMaLGaM_WB_init_greedy.exe -s -v -r -g 13 " + str(current_number_of_circles * 2) + \
+                    cmd = "AMaLGaM.exe -s -v -r -g 13 " + str(current_number_of_circles * 2) + \
                           " 0 1 0 3.5e-1 " + str(pop_size) + " " + str(number_of_populations) + " 9e-1 1 " + str(number_of_evaluations) + " " + \
                           str(vtr) + " 35 " + str(allowed_variance) + " " + str(1/benchmark_distance) + " " + \
                           str(check_improvement_checkpoints) + " " + str(pop_size_multipliers)
@@ -78,8 +78,8 @@ def main():
     print("total number of restarts used: ")
     print(str(all_number_of_restarts))
 
-    save('Benchmark_AMaLGaM_WB_optimized_init_naive_greedy', all_results)
-    save('Benchmark_AMaLGaM_WB_optimized_init_naive_greedy_#restarts', all_number_of_restarts)
+    save('Benchmark_AMaLGaM_BB', all_results)
+    save('Benchmark_AMaLGaM_BB_#restarts', all_number_of_restarts)
 
 
     # print("Problem of " + str(number_of_circles) + " circles solved with a precision of " +
