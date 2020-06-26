@@ -43,7 +43,7 @@ y_max_evals = ones(size(results.num_points))*max_evals;
 yyaxis left
 errorbar(results.num_points, results.mean_evaluations, results.std_evaluations)
 hold on;
-plot(results.num_points, y_max_evals)
+plot(results.num_points, y_max_evals, 'r-' ,'HandleVisibility','off')
 hold off
 
 xlabel('Number of points')
@@ -67,7 +67,7 @@ errorbar(results.num_points, pk_dist-results.mean_best_obj_vals, results.std_bes
 hold on;
 plot(results.num_points, y_accuracy)
 hold off
-ylabel('Objective value deviation from VTR')
+ylabel('Best objective value deviation from VTR')
 
 yyaxis right
 plot(results.num_points, results.VTR_reached_count, 'x')
@@ -75,7 +75,7 @@ ylim([-0.5 10.5])
 ylabel('VTR reached count')
 
 xlim([1.9 9.1])
-xlabel('Number of points points')
+xlabel('Number of points')
 end
 
 function plot_d_avg_obj_val(results, pk_dist, accuracy)
@@ -87,7 +87,7 @@ errorbar(results.num_points, pk_dist-results.mean_avg_obj_vals, results.std_avg_
 hold on;
 plot(results.num_points, y_accuracy)
 hold off
-ylabel('Objective value deviation from VTR')
+ylabel('Average objective value deviation from VTR')
 set(gca, 'YScale', 'log')
 
 yyaxis right

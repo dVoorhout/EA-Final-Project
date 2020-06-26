@@ -9,6 +9,7 @@ class Exitflag:
     max_gen = -2
     pop_converged = -3
     no_improvements = -4
+    no_improvements_gen_10 = -5
 
 
 def find_reliable(algo, 
@@ -17,6 +18,7 @@ def find_reliable(algo,
                   max_generations=None, 
                   min_pop_diff=10**-12, 
                   num_runs=10,
+                  crossover='std',
                   verbose=True):
     # Returns True when the algorithm can find the optimum 10 times a row otherwise False
     results = dict()
@@ -31,10 +33,12 @@ def find_reliable(algo,
         print(f"RUN #{i}")
         start_time = time()
         algo.reset()
-        algo.run(max_evaluations=max_evaluations,
-                 max_generations=max_generations,
-                 stop_on_small_pop_diff=min_pop_diff, # Stop when the diff between avg_obj_val and best_obj_val is too small 
-                 verbose=False) # Will crash the jupyter notebook when turned on with many experiments
+        algo.run(
+            crossover=crossover,
+            max_evaluations=max_evaluations,
+            max_generations=max_generations,
+            stop_on_small_pop_diff=min_pop_diff, # Stop when the diff between avg_obj_val and best_obj_val is too small 
+            verbose=False) # Will crash the jupyter notebook when turned on with many experiments
 
         if verbose:
             print("\tAVG_OBJ: ", algo.iter_avg_obj_val[-1])

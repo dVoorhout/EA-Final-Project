@@ -1,11 +1,41 @@
-Settings:
-    differential_weight = 0.5         
-    crossover_prob = 0.95      
-    max_generations = 1000
-    optimum_accuracy = 10**-3
-    
-    dim:
-        3 : 64
-        4 : 64
-        5 : 64
-        6 : 256
+OLD
+Accuracy 1e-3:
+    CR: 0.9
+    F: 0.5
+    NP: 15D
+
+Accuracy 1e-6:
+    CR: 0.9
+    F: 0.1
+    NP: 20D
+
+
+NEW
+Accuracy 1e-3:
+    CR: 0.99 /0.5
+    F: 0.3 / 0.5
+    NP: 15D / 5D
+
+Accuracy 1e-6:
+    CR: 0.8
+    F: 0.1
+    NP: 20D
+
+
+A3
+    v3: CR=0.99 F=0.3 15D <-
+    v4: CR=0.5 F=0.5 5D
+A6
+    v2: CR=0.9 F=0.1 20D <-
+    v3: CR=0.8 F=0.1 20D
+    v4: CR=0.99 F=0.1 20D
+    test: CR=0.9 F=0.1 30D
+    CR80: CR=0.8 F=0.1 30D
+    CR99: CR=0.99 F=0.1 30D
+
+
+Restart criteria:
+A3:
+    1e-10
+A6:
+    1e-25

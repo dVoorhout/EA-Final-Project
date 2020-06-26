@@ -19,6 +19,7 @@ def scattering_points(solution):
     # The solution are encoded as an array of [x1, y1, x2, y2, ..., xn, yn]
     
     d = 10 # The distance between 2 points inside a unit square cannot be larger than 10
+    bottleneck_points = () # The points that determine the objective value
     for i in range(0, len(solution), 2):
         for j in range(0, len(solution), 2):
             if i != j:
@@ -27,7 +28,8 @@ def scattering_points(solution):
                 result = (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2)
                 if result < d:
                     d = result
-    return sqrt(d)
+                    bottleneck_points = (i, i+1, j, j+1)
+    return sqrt(d), bottleneck_points
 
 
 def get_stricter_bounds(num_points):
